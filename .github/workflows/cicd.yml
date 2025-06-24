@@ -2,8 +2,10 @@ name: Deploy BigQuery View
 
 on:
   push:
+    branches:
+      - main                      # ✅ Only trigger on pushes to main
     paths:
-      - 'flight_booking_view.sql'  # or *.sql
+      - 'flight_booking_view.sql' # ✅ Target only the SQL file
 
 jobs:
   deploy:
