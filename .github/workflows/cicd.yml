@@ -1,0 +1,30 @@
+name: Deploy BigQuery View
+
+on:
+  push:
+    branches:
+      - main                      # ✅ Only trigger on pushes to main
+    paths:
+      - 'flight_booking_view.sql' # ✅ Target only the SQL file
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          version: 'latest'
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Run bq to deploy view
+        run: |
+          bq query \
+            --use_legacy_sql=false \
+            --project_id=${{ secrets.GCP_PROJECT_ID }} \
+            < flight_booking_view.sql
