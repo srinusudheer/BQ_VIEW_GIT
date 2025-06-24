@@ -3,9 +3,17 @@ name: Deploy BigQuery View
 on:
   push:
     branches:
-      - main                      # ✅ Only trigger on pushes to main
+      - main
     paths:
-      - 'flight_booking_view.sql' # ✅ Target only the SQL file , added creds in git.
+      - 'flight_booking_view.sql'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'flight_booking_view.sql'
+
+  workflow_dispatch:
 
 jobs:
   deploy:
