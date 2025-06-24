@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'flight_booking_view.sql'
+      - 'flight_booking_view.sql' #hope it gets success
 
   pull_request:
     branches:
