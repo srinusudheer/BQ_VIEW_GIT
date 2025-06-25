@@ -8,10 +8,11 @@ length_of_stay,
 flight_hour,
 flight_day,
 route,
+wants_in_flight_meals,flight_duration,booking_complete,
 booking_origin,
 wants_extra_baggage,
-wants_preferred_seat,
-wants_in_flight_meals,flight_duration,booking_complete
+wants_preferred_seat
+
 
   FROM `smiling-parser-462606-v9.timmu_test.flight_booking_data`
 -- this is a test code for creating a view
