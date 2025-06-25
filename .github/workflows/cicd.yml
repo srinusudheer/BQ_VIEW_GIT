@@ -105,7 +105,7 @@ jobs:
           if [[ "${GITHUB_REF##*/}" == "dev" ]]; then
             sed 's/`smiling-parser-462606-v9\.timmu_test_prod/`smiling-parser-462606-v9.timmu_test/g' flight_booking_view.sql > replaced_view.sql
           else
-            sed 's/`smiling-parser-462606-v9\.timmu_test/`smiling-parser-462606-v9.timmu_test_prod/g' flight_booking_view.sql > replaced_view.sql
+            sed 's/`smiling-parser-462606-v9\.timmu_test`/`smiling-parser-462606-v9.timmu_test_prod`/g' flight_booking_view.sql > replaced_view.sql
           fi
 
       - name: Deploy View to BigQuery
