@@ -81,7 +81,7 @@ jobs:
           install_components: gsutil
 
       - name: Deploy View to QA
-        if: github.ref == 'refs/heads/qa'
+        if: github.ref == 'refs/heads/dev'
         run: |
           bq query \
             --use_legacy_sql=false \
