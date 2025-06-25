@@ -5,3 +5,4 @@ flight_hour, flight_day, route, booking_origin, wants_extra_baggage,
   booking_complete
   FROM `smiling-parser-462606-v9.timmu_test.flight_booking_data`
 -- this is a test code for creating a view
+-- this lines are for testing

@@ -62,6 +62,7 @@
 #            --project_id=${{ secrets.GCP_PROJECT_ID }} \
 #            --destination_table=timmu_test_prod.flight_booking_view \
 #            < flight_booking_view.sql
+#added some test lines in the code
 name: Deploy BigQuery View in QA and Prod
 
 on:
