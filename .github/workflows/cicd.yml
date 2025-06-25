@@ -80,6 +80,21 @@ on:
       - 'flight_booking_view.sql'
 
 jobs:
+  validate-sql:
+    name: Validate SQL on PR
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: SQL Dry Run Validation
+        run: |
+          echo "🔍 Running SQL dry run..."
+          bq query \
+            --use_legacy_sql=false \
+            --dry_run \
+            < flight_booking_view.sql
   deploy:
     runs-on: ubuntu-latest
     steps:
