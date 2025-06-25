@@ -221,7 +221,7 @@ jobs:
 
       - name: Replace BQ dataset for PROD (timmu_test_prod)
         run: |
-          sed 's/`smiling-parser-462606-v9\.timmu_test`/`smiling-parser-462606-v9.timmu_test_prod`/g' flight_booking_view.sql > replaced_view.sql
+          sed 's/`smiling-parser-462606-v9\.timmu_test_prod`/`smiling-parser-462606-v9.timmu_test`/g' flight_booking_view.sql > replaced_view.sql
 
       - name: Deploy BigQuery View to PROD
         run: |
