@@ -63,7 +63,92 @@
 #            --destination_table=timmu_test_prod.flight_booking_view \
 #            < flight_booking_view.sql
 #added some test lines in the code
-name: Deploy BigQuery View in QA and Prod
+
+
+#name: Deploy BigQuery View in QA and Prod
+#
+#on:
+#  push:
+#    branches:
+#      - dev
+#      - main
+#    paths:
+#      - 'flight_booking_view.sql' #hope it gets success
+#
+#  pull_request:
+#    branches:
+#      - main
+#    paths:
+#      - 'flight_booking_view.sql'
+#
+#jobs:
+#  validate-sql:
+#    name: Validate SQL on PR
+#    if: |
+#      github.event_name == 'push' &&
+#      (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v3
+#      - name: Authenticate to Google Cloud
+#        uses: google-github-actions/auth@v1
+#        with:
+#          # Service account key JSON, stored as a repo secret
+#          credentials_json: ${{ secrets.GCP_SA_KEY }}
+#
+#      - name: Set up gcloud & gsutil
+#        uses: google-github-actions/setup-gcloud@v2
+#        with:
+#          project_id: ${{ secrets.GCP_PROJECT_ID }}
+#          # optional: install components
+#          install_components: gsutil
+#
+#
+#      - name: SQL Dry Run Validation
+#        run: |
+#          echo "🔍 Running SQL dry run..."
+#          bq query \
+#            --use_legacy_sql=false \
+#            --dry_run \
+#            < flight_booking_view.sql
+#  deploy:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v3
+#
+#      - name: Authenticate to Google Cloud
+#        uses: google-github-actions/auth@v1
+#        with:
+#          # Service account key JSON, stored as a repo secret
+#          credentials_json: ${{ secrets.GCP_SA_KEY }}
+#
+#      - name: Set up gcloud & gsutil
+#        uses: google-github-actions/setup-gcloud@v2
+#        with:
+#          project_id: ${{ secrets.GCP_PROJECT_ID }}
+#          # optional: install components
+#          install_components: gsutil
+#
+#
+#
+#      - name: Replace dataset for QA or PROD
+#        run: |
+#          if [[ "${GITHUB_REF##*/}" == "dev" ]]; then
+#            sed 's/`smiling-parser-462606-v9\.timmu_test_prod/`smiling-parser-462606-v9.timmu_test/g' flight_booking_view.sql > replaced_view.sql
+#          else
+#            sed 's/`smiling-parser-462606-v9\.timmu_test`/`smiling-parser-462606-v9.timmu_test_prod`/g' flight_booking_view.sql > replaced_view.sql
+#          fi
+#
+#      - name: Deploy View to BigQuery
+#        run: |
+#          bq query \
+#            --use_legacy_sql=false \
+#            --project_id=${{ secrets.GCP_PROJECT_ID }} \
+#            < replaced_view.sql
+
+name: Deploy BigQuery View
 
 on:
   push:
@@ -80,15 +165,13 @@ on:
       - 'flight_booking_view.sql'
 
 jobs:
-  validate-sql:
-    name: Validate SQL on PR
-    if: |
-      github.event_name == 'push' &&
-      (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
+  upload-to-dev:
+    if: github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
@@ -103,14 +186,19 @@ jobs:
           install_components: gsutil
 
 
-      - name: SQL Dry Run Validation
+      - name: Replace BQ dataset for QA (timmu_test)
         run: |
-          echo "🔍 Running SQL dry run..."
+          sed 's/`smiling-parser-462606-v9\.timmu_test_prod`/`smiling-parser-462606-v9.timmu_test`/g' flight_booking_view.sql > replaced_view.sql
+
+      - name: Deploy BigQuery View to QA
+        run: |
           bq query \
             --use_legacy_sql=false \
-            --dry_run \
-            < flight_booking_view.sql
-  deploy:
+            --project_id=${{ secrets.GCP_PROJECT_ID }} \
+            < replaced_view.sql
+
+  upload-to-prod:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -131,15 +219,11 @@ jobs:
 
 
 
-      - name: Replace dataset for QA or PROD
+      - name: Replace BQ dataset for PROD (timmu_test_prod)
         run: |
-          if [[ "${GITHUB_REF##*/}" == "dev" ]]; then
-            sed 's/`smiling-parser-462606-v9\.timmu_test_prod/`smiling-parser-462606-v9.timmu_test/g' flight_booking_view.sql > replaced_view.sql
-          else
-            sed 's/`smiling-parser-462606-v9\.timmu_test`/`smiling-parser-462606-v9.timmu_test_prod`/g' flight_booking_view.sql > replaced_view.sql
-          fi
+          sed 's/`smiling-parser-462606-v9\.timmu_test`/`smiling-parser-462606-v9.timmu_test_prod`/g' flight_booking_view.sql > replaced_view.sql
 
-      - name: Deploy View to BigQuery
+      - name: Deploy BigQuery View to PROD
         run: |
           bq query \
             --use_legacy_sql=false \

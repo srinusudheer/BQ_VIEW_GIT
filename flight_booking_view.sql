@@ -1,6 +1,9 @@
 CREATE OR REPLACE VIEW `smiling-parser-462606-v9.timmu_test_prod.flight_booking_data_view` AS
-SELECT num_passengers,
+SELECT
+num_passengers,
 sales_channel,
+trip_type,
+purchase_lead,
 flight_hour,
 flight_day,
 route,
