@@ -188,8 +188,7 @@ jobs:
 
       - name: Replace BQ dataset for QA (timmu_test)
         run: |
-          sed 's/`smiling-parser-462606-v9\.timmu_test_prod`/`smiling-parser-462606-v9.timmu_test`/g' flight_booking_view.sql > replaced_view.sql
-
+          sed 's|`smiling-parser-462606-v9\.timmu_test_prod\.flight_booking_data_view`|`smiling-parser-462606-v9.timmu_test.flight_booking_data_view`|g' flight_booking_view.sql > replaced_view.sql
       - name: Deploy BigQuery View to QA
         run: |
           bq query \
@@ -221,8 +220,7 @@ jobs:
 
       - name: Replace BQ dataset for PROD (timmu_test_prod)
         run: |
-          sed 's/`smiling-parser-462606-v9\.timmu_test`/`smiling-parser-462606-v9.timmu_test_prod`/g' flight_booking_view.sql > replaced_view.sql
-
+          cp flight_booking_view.sql replaced_view.sql
       - name: Deploy BigQuery View to PROD
         run: |
           bq query \
