@@ -44,6 +44,24 @@
 #            < flight_booking_view.sql
 #
 #
+
+#      - name: Deploy View to QA
+#        if: github.ref == 'refs/heads/dev'
+#        run: |
+#          bq query \
+#            --use_legacy_sql=false \
+#            --project_id=${{ secrets.GCP_PROJECT_ID }} \
+#            --destination_table=timmu_test.flight_booking_view \
+#            < flight_booking_view.sql
+#
+#      - name: Deploy View to PROD
+#        if: github.ref == 'refs/heads/main'
+#        run: |
+#          bq query \
+#            --use_legacy_sql=false \
+#            --project_id=${{ secrets.GCP_PROJECT_ID }} \
+#            --destination_table=timmu_test_prod.flight_booking_view \
+#            < flight_booking_view.sql
 name: Deploy BigQuery View in QA and Prod
 
 on:
@@ -80,20 +98,19 @@ jobs:
           # optional: install components
           install_components: gsutil
 
-      - name: Deploy View to QA
-        if: github.ref == 'refs/heads/dev'
-        run: |
-          bq query \
-            --use_legacy_sql=false \
-            --project_id=${{ secrets.GCP_PROJECT_ID }} \
-            --destination_table=timmu_test.flight_booking_view \
-            < flight_booking_view.sql
 
-      - name: Deploy View to PROD
-        if: github.ref == 'refs/heads/main'
+
+      - name: Replace dataset for QA or PROD
+        run: |
+          if [[ "${GITHUB_REF##*/}" == "dev" ]]; then
+            sed 's/`smiling-parser-462606-v9\.timmu_test_prod/`smiling-parser-462606-v9.timmu_test/g' flight_booking_view.sql > replaced_view.sql
+          else
+            sed 's/`smiling-parser-462606-v9\.timmu_test/`smiling-parser-462606-v9.timmu_test_prod/g' flight_booking_view.sql > replaced_view.sql
+          fi
+
+      - name: Deploy View to BigQuery
         run: |
           bq query \
             --use_legacy_sql=false \
             --project_id=${{ secrets.GCP_PROJECT_ID }} \
-            --destination_table=timmu_test_prod.flight_booking_view \
-            < flight_booking_view.sql
+            < replaced_view.sql
